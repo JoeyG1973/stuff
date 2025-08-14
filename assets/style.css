@@ -1,0 +1,7 @@
+:root { color-scheme: light dark; }
+html, body { margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; }
+main { max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+footer { max-width: 720px; margin: 2rem auto; padding: 0 1rem; color: #666; }
+a { color: #06c; }

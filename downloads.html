@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Downloads — Releases</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    .muted { color:#666 }
+    .grid { display:grid; gap:1rem }
+    .card { border:1px solid #ddd; border-radius:8px; padding:1rem }
+    @media (prefers-color-scheme: dark) {
+      .card { border-color:#444 }
+      .muted { color:#aaa }
+    }
+    .assets { margin:0.5rem 0 0; padding-left:1.25rem }
+    .asset { margin:0.25rem 0 }
+    code.inline { padding: 0.1rem 0.25rem; border-radius: 4px; background: rgba(0,0,0,0.06) }
+    .err { color: #b00 }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Downloads — GitHub Releases</h1>
+    <p class="muted">Large/binary files are published as GitHub Release assets for reliable, fast downloads.</p>
+
+    <div id="content" class="grid" aria-live="polite">
+      <p>Loading releases…</p>
+    </div>
+
+    <h2>How to add a new download</h2>
+    <ol>
+      <li>Put files in <code class="inline">release-assets/</code> in this repo.</li>
+      <li>Create a tag (e.g., <code class="inline">v1.0.0</code>) and push it — the workflow will create a Release and upload files.</li>
+    </ol>
+    <p class="muted">Note: API requests are rate-limited unauthenticated. If you see errors, try again later.</p>
+  </main>
+
+  <script>
+    const owner = 'JoeyG1973';
+    const repo = 'joeyg1973.github.io';
+    const api = `https://api.github.com/repos/${owner}/${repo}/releases`;
+
+    const humanSize = (n) => {
+      if (!Number.isFinite(n)) return '';
+      const units = ['B','KB','MB','GB','TB'];
+      let i = 0;
+      while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+      return n.toFixed(n < 10 && i > 0 ? 1 : 0) + ' ' + units[i];
+    };
+
+    async function load() {
+      const container = document.getElementById('content');
+      try {
+        const res = await fetch(api, { headers: { 'Accept': 'application/vnd.github+json' }});
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const releases = await res.json();
+        if (!Array.isArray(releases) || releases.length === 0) {
+          container.innerHTML = '<p class="muted">No releases yet. Add files to release-assets/, tag a version, and push.</p>';
+          return;
+        }
+        container.innerHTML = '';
+        for (const r of releases) {
+          const card = document.createElement('section');
+          card.className = 'card';
+          const date = r.published_at ? new Date(r.published_at).toLocaleString() : 'Unpublished';
+          const title = r.name || r.tag_name;
+          card.innerHTML = `
+            <h2 style="margin:0">${title}</h2>
+            <p class="muted" style="margin:0.25rem 0 0.5rem">Tag: <code class="inline">${r.tag_name}</code> • ${date}</p>
+            <div>${(r.body || '').replace(/[<>]/g, s => ({'<':'&lt;','>':'&gt;'}[s]))}</div>
+          `;
+          const assets = document.createElement('ul');
+          assets.className = 'assets';
+          if (r.assets && r.assets.length) {
+            for (const a of r.assets) {
+              const li = document.createElement('li');
+              li.className = 'asset';
+              const url = a.browser_download_url;
+              li.innerHTML = `
+                <a href="${url}" rel="noopener">${a.name}</a>
+                <span class="muted">(${humanSize(a.size)})</span>
+              `;
+              assets.appendChild(li);
+            }
+          } else {
+            const li = document.createElement('li');
+            li.className = 'asset muted';
+            li.textContent = 'No assets';
+            assets.appendChild(li);
+          }
+          card.appendChild(assets);
+          container.appendChild(card);
+        }
+      } catch (e) {
+        container.innerHTML = '<p class="err">Could not load releases: ' + e.message + '</p>';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
