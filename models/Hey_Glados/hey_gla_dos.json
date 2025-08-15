@@ -1,9 +1,9 @@
 {
   "type": "micro",
-  "wake_word": "hey glados",
-  "author": "JoeCoolInc",
-  "website": "https://github.com/JoeCoolInc",
-  "model": "Hey_Glados.tflite",
+  "wake_word": "hey_gla_dos",
+  "author": "master phooey",
+  "website": "https://github.com/MasterPhooey/MicroWakeWord-Trainer-Docker",
+  "model": "hey_gla_dos.tflite",
   "trained_languages": [
     "en"
   ],
