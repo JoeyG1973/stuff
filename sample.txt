@@ -1,6 +1,0 @@
-Hello from a GitHub Pages user site!
-
-This file will:
-- Open inline at /sample.txt (browser default for text)
-- Prompt to save with <a download> links
-- Force download via /download.html?file=sample.txt&name=sample.txt
